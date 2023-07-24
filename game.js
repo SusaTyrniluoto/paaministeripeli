@@ -23,14 +23,31 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let playerSpeed = (canvas.width / referenceScreenWidth) * baseSpeed;
 
+
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    let playerBaseWidth = 170;
+    let playerBaseHeight = 170;
+    
+    if (isMobileDevice()) {
+        playerBaseWidth = 80;  // Pienennä pelaajan leveyttä
+        playerBaseHeight = 80; // Pienennä pelaajan korkeutta
+    }
+    
+    let distanceFromBottom = 20; // esimerkiksi 50 pikseliä alareunasta
+
     let player = {
-        x: canvas.width / 2 - 50,
-        y: canvas.height - 150,
-        width: 150,
-        height: 150,
+        x: canvas.width / 2 - playerBaseWidth / 2,
+        y: canvas.height - playerBaseHeight - distanceFromBottom,
+        width: playerBaseWidth,
+        height: playerBaseHeight,
         speed: 25,
         direction: 1  // 1 for right, -1 for left
     };
+
+    
 
     const hahmoImages = [
         new Image(),
@@ -279,6 +296,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function handleTouch(e) {
         e.preventDefault();
+        
+        const mobileSpeedModifier = 0.2; // Lisätty muuttuja, joka hidastaa nopeutta puoleen
     
         if (e.type === 'touchstart') {
             let touchX = e.touches[0].clientX;
@@ -288,7 +307,11 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (e.type === 'touchend') {
             isTouching = false;
         }
+    
+        // Päivitä pelaajan nopeus mobiiliohjauksessa
+        playerSpeed = (canvas.width / referenceScreenWidth) * baseSpeed * mobileSpeedModifier;
     }
+    
     
     
     
