@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const playerImage = new Image();
     playerImage.src = 'kuvat/pelaaja.png';
 
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioContext = new AudioContext();
 
     let gameState = "notStarted";
     //let gameLoopRunning = false;
