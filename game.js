@@ -52,7 +52,9 @@ document.addEventListener("DOMContentLoaded", function() {
     let score = 0;
     let toimintakyky = 10;
 
-
+    let isTouching = false;
+    let touchDirection = 0; // -1 vasemmalle, 1 oikealle
+    
     
 
 
@@ -155,9 +157,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
         // ... (muu koodi pysyy samana)
 
-        
-
-
         // Esineiden päivitys
         esineet.forEach((esine, index) => {
             if (esine.active) {
@@ -187,6 +186,12 @@ document.addEventListener("DOMContentLoaded", function() {
             canvas.removeEventListener('touchstart', handleTouch);
             document.getElementById("finalScore").textContent = "Sait " + score + " pistettä";
         }
+        if (isTouching) {
+            player.x += playerSpeed * touchDirection;
+            // Varmista, että pelaaja ei mene ulos ruudusta:
+            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+        }
+    
     }
 
     // ...
@@ -267,25 +272,16 @@ document.addEventListener("DOMContentLoaded", function() {
         
     });
 
+
     function handleTouch(e) {
-        e.preventDefault(); // Estä oletustoiminnot, kuten vieritys
+        e.preventDefault();
     
-        // Ota huomioon kaikki kosketuspisteet (monikosketus)
-        for (let i = 0; i < e.touches.length; i++) {
-            let touch = e.touches[i];
-    
-            // Jos kosketus on ruudun vasemmalla puolella
-            if (touch.pageX < window.innerWidth / 2) {
-                // Liikuta pelaajaa vasemmalle
-                player.x -= playerSpeed;
-                player.direction = -1;
-            } 
-            // Jos kosketus on ruudun oikealla puolella
-            else if (touch.pageX > window.innerWidth / 2) {
-                // Liikuta pelaajaa oikealle
-                player.x += playerSpeed;
-                player.direction = 1;
-            }
+        if (e.type === 'touchstart') {
+            let touchX = e.touches[0].clientX;
+            touchDirection = touchX > canvas.width / 2 ? 1 : -1;
+            isTouching = true;
+        } else if (e.type === 'touchend') {
+            isTouching = false;
         }
     }
     
