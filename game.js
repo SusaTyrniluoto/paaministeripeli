@@ -16,6 +16,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let gameState = "notStarted";
     //let gameLoopRunning = false;
 
+    canvas.addEventListener('touchstart', handleTouch, false);
+
     const baseSpeed = 25; // esimerkiksi 25 pikseliä per päivitys referenssinäytön leveydellä
     const referenceScreenWidth = 1520; // esimerkiksi Full HD -näytön leveys
 
@@ -182,6 +184,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
         if (toimintakyky <= 0) {
             gameState = "gameover";
+            canvas.removeEventListener('touchstart', handleTouch);
             document.getElementById("finalScore").textContent = "Sait " + score + " pistettä";
         }
     }
@@ -264,5 +267,27 @@ document.addEventListener("DOMContentLoaded", function() {
         
     });
 
+    function handleTouch(e) {
+        e.preventDefault(); // Estä oletustoiminnot, kuten vieritys
+    
+        // Ota huomioon kaikki kosketuspisteet (monikosketus)
+        for (let i = 0; i < e.touches.length; i++) {
+            let touch = e.touches[i];
+    
+            // Jos kosketus on ruudun vasemmalla puolella
+            if (touch.pageX < window.innerWidth / 2) {
+                // Liikuta pelaajaa vasemmalle
+                player.x -= playerSpeed;
+                player.direction = -1;
+            } 
+            // Jos kosketus on ruudun oikealla puolella
+            else if (touch.pageX > window.innerWidth / 2) {
+                // Liikuta pelaajaa oikealle
+                player.x += playerSpeed;
+                player.direction = 1;
+            }
+        }
+    }
+    
 });
 
