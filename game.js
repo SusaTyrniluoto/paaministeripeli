@@ -55,6 +55,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let isTouching = false;
     let touchDirection = 0; // -1 vasemmalle, 1 oikealle
     
+    canvas.addEventListener('touchend', handleTouch, false);
+
     
 
 
@@ -187,9 +189,11 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("finalScore").textContent = "Sait " + score + " pistettä";
         }
         if (isTouching) {
-            player.x += playerSpeed * touchDirection;
-            // Varmista, että pelaaja ei mene ulos ruudusta:
-            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+            if (touchDirection === 1 && player.x + player.width < canvas.width) {
+                player.x += playerSpeed;
+            } else if (touchDirection === -1 && player.x > 0) {
+                player.x -= playerSpeed;
+            }
         }
     
     }
@@ -279,11 +283,14 @@ document.addEventListener("DOMContentLoaded", function() {
         if (e.type === 'touchstart') {
             let touchX = e.touches[0].clientX;
             touchDirection = touchX > canvas.width / 2 ? 1 : -1;
+            player.direction = touchDirection;
             isTouching = true;
         } else if (e.type === 'touchend') {
             isTouching = false;
         }
     }
+    
+    
     
 });
 
