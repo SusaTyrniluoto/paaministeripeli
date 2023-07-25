@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     canvas.addEventListener('touchstart', handleTouch, false);
 
-    const baseSpeed = 25; // esimerkiksi 25 pikseliä per päivitys referenssinäytön leveydellä
-    const referenceScreenWidth = 1520; // esimerkiksi Full HD -näytön leveys
+    const baseSpeed = 20; // esimerkiksi 25 pikseliä per päivitys referenssinäytön leveydellä
+    const referenceScreenWidth = 1220; // esimerkiksi Full HD -näytön leveys
 
     let playerSpeed = (canvas.width / referenceScreenWidth) * baseSpeed;
 
@@ -28,10 +28,16 @@ document.addEventListener("DOMContentLoaded", function() {
     
     let playerBaseWidth = 170;
     let playerBaseHeight = 170;
-    
     if (isMobileDevice()) {
         playerBaseWidth = 80;  // Pienennä pelaajan leveyttä
         playerBaseHeight = 80; // Pienennä pelaajan korkeutta
+    }
+
+    let esineBaseWidth = 50;  // oletuskoko
+    let esineBaseHeight = 50; // oletuskoko
+    if (isMobileDevice()) {
+        esineBaseWidth = 30;  // Pienennä esineen leveyttä mobiililaitteilla
+        esineBaseHeight = 30; // Pienennä esineen korkeutta mobiililaitteilla
     }
     
     let distanceFromBottom = 20; // esimerkiksi 50 pikseliä alareunasta
@@ -70,9 +76,9 @@ document.addEventListener("DOMContentLoaded", function() {
     let isTouching = false;
     let touchDirection = 0; // -1 vasemmalle, 1 oikealle
     
+    let movementInterval;
+    canvas.addEventListener('touchstart', handleTouch, false);
     canvas.addEventListener('touchend', handleTouch, false);
-
-    
 
 
 
@@ -118,10 +124,10 @@ document.addEventListener("DOMContentLoaded", function() {
         let hahmoType = esineType === 'risti' ? 2 : Math.floor(Math.random() * 2);
 
         let esine = {
-            x: Math.random() * (canvas.width - 150),
-            y: -50,  // Aseta esineen alkuarvo hahmon yläpuolelle
-            width: 50,
-            height: 50,
+            x: Math.random() * (canvas.width - esineBaseWidth),
+            y: -esineBaseHeight,
+            width: esineBaseWidth,
+            height: esineBaseHeight,
             speed: 5,
             rotation: 0,
             rotationSpeed: (Math.random() - 0.5) * 0.1,
@@ -291,24 +297,29 @@ document.addEventListener("DOMContentLoaded", function() {
         
     });
 
-
     function handleTouch(e) {
         e.preventDefault();
         
-        const mobileSpeedModifier = 0.2; // Lisätty muuttuja, joka hidastaa nopeutta puoleen
-    
         if (e.type === 'touchstart') {
             let touchX = e.touches[0].clientX;
-            touchDirection = touchX > canvas.width / 2 ? 1 : -1;
+            let touchDirection = touchX > canvas.width / 2 ? 1 : -1;
             player.direction = touchDirection;
-            isTouching = true;
-        } else if (e.type === 'touchend') {
-            isTouching = false;
-        }
     
-        // Päivitä pelaajan nopeus mobiiliohjauksessa
-        playerSpeed = (canvas.width / referenceScreenWidth) * baseSpeed * mobileSpeedModifier;
+            // Aloita toistuva liike
+            movementInterval = setInterval(() => {
+                if (touchDirection === 1 && player.x + player.width < canvas.width) {
+                    player.x += playerSpeed;
+                } else if (touchDirection === -1 && player.x > 0) {
+                    player.x -= playerSpeed;
+                }
+            }, 100);  // 100ms välein, voit säätää tätä arvoa tarpeesi mukaan
+        } else if (e.type === 'touchend') {
+            // Lopeta toistuva liike
+            clearInterval(movementInterval);
+        }
     }
+    
+    
     
     
     
