@@ -7,9 +7,46 @@ document.addEventListener("DOMContentLoaded", function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let source;
+    let buffer;
+
+    fetch('audio/pelimusa.mp3')
+        .then(response => response.arrayBuffer())
+        .then(data => audioContext.decodeAudioData(data))
+        .then(decodedBuffer => {
+            buffer = decodedBuffer;
+        })
+        .catch(e => {
+            console.error(e);
+        });
+
+    function playSound(audioBuffer) {
+        source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.loop = true;
+        source.connect(audioContext.destination);
+        source.start();
+    }
+
+    let isPlaying = false;  // Muuttuja, joka seuraa, onko musiikki päällä vai ei
+
+    document.getElementById("musicToggle").addEventListener("change", function() {
+        if (this.checked) {
+            playSound(buffer);  // Aloita musiikki
+        } else {
+            stopSound();  // Pysäytä musiikki
+        }
+    });
+
+    // Kun haluat pysäyttää musiikin
+    function stopSound() {
+        if (source) {
+            source.stop();
+        }
+    }
     const playerImage = new Image();
     playerImage.src = 'kuvat/pelaaja.png';
-
 
     let gameState = "notStarted";
     //let gameLoopRunning = false;
@@ -40,6 +77,15 @@ document.addEventListener("DOMContentLoaded", function() {
         esineBaseHeight = 30; // Pienennä esineen korkeutta mobiililaitteilla
     }
     
+    let hahmoBaseWidth = 150;  // esimerkkikoko
+    let hahmoBaseHeight = 150; // esimerkkikoko
+    if (isMobileDevice()) {
+        hahmoBaseWidth = 80;  // Pienennä hahmon leveyttä
+        hahmoBaseHeight = 80; // Pienennä hahmon korkeutta
+    }
+    
+
+
     let distanceFromBottom = 20; // esimerkiksi 50 pikseliä alareunasta
 
     let player = {
@@ -80,15 +126,13 @@ document.addEventListener("DOMContentLoaded", function() {
     canvas.addEventListener('touchstart', handleTouch, false);
     canvas.addEventListener('touchend', handleTouch, false);
 
-
+    let baseEsineSpeed = 5;  // Oletusnopeus esineille
+    let baseHahmoSpeed = 2;  // Oletusnopeus hahmoille
     let gameSpeedMultiplier = 1;
 
     esineet.speed = baseEsineSpeed * gameSpeedMultiplier;
     hahmot.speed = baseHahmoSpeed * gameSpeedMultiplier;
-    
-    setInterval(() => {
-        gameSpeedMultiplier += 0.1;  // Lisää nopeuskerrointa 0.1 yksiköllä
-    }, 30000);  // Kasvata nopeutta joka 30. sekunti
+
     
     function startGame() {
         console.log("startGame called");
@@ -136,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function() {
             y: -esineBaseHeight,
             width: esineBaseWidth,
             height: esineBaseHeight,
-            speed: 5,
+            speed: baseEsineSpeed * gameSpeedMultiplier,
             rotation: 0,
             rotationSpeed: (Math.random() - 0.5) * 0.1,
             type: esineType,
@@ -146,9 +190,9 @@ document.addEventListener("DOMContentLoaded", function() {
         let hahmo = {
             x: esine.x,
             y: -150,
-            width: 150,
-            height: 150,
-            speed: 2,
+            width: hahmoBaseWidth,
+            height: hahmoBaseHeight,
+            speed: baseHahmoSpeed * gameSpeedMultiplier,
             type: hahmoType,
             state: 'descending',
             esine: esine  // Liitä esine hahmoon
@@ -209,6 +253,9 @@ document.addEventListener("DOMContentLoaded", function() {
                         toimintakyky -= 1;
                     }
                     esineet.splice(index, 1);  // Poista esine esineet-taulukosta
+                }
+                if (esine.x + esine.width > canvas.width) {
+                    esine.x = canvas.width - esine.width;
                 }
             }
         });
@@ -328,7 +375,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     
-    
+    setInterval(() => {
+        gameSpeedMultiplier += 0.1;  // Lisää nopeuskerrointa 0.1 yksiköllä
+    }, 30000);  // Kasvata nopeutta joka 30. sekunti
     
     
     
