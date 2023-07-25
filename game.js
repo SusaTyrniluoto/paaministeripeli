@@ -81,7 +81,15 @@ document.addEventListener("DOMContentLoaded", function() {
     canvas.addEventListener('touchend', handleTouch, false);
 
 
+    let gameSpeedMultiplier = 1;
 
+    esineet.speed = baseEsineSpeed * gameSpeedMultiplier;
+    hahmot.speed = baseHahmoSpeed * gameSpeedMultiplier;
+    
+    setInterval(() => {
+        gameSpeedMultiplier += 0.1;  // Lisää nopeuskerrointa 0.1 yksiköllä
+    }, 30000);  // Kasvata nopeutta joka 30. sekunti
+    
     function startGame() {
         console.log("startGame called");
         document.getElementById("startScreen").style.display = "none";  // Piilota aloitusnäyttö
