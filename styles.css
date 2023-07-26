@@ -27,24 +27,49 @@ h3 {
 
 canvas {
     display: block;
-    background-color: #e0e0e0;
+    background-color: #ffffff;
+}
+
+#frontPage {
+    text-align: center;
+
+    background-color: #cacaca;
+    border: 1px solid #ccc;
+    position:top;
+    width: 100%;
+    max-width: 600px;
+
 }
 
 #startScreen {
     text-align: center;
-    padding: 200px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    position:relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 600px;
-    padding-bottom: 50px;
+    padding: 20px;
+    background-color: #ffffff;
+    position: relative;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#pelinEsittelyruutu {
+    border: 1px solid rgb(0, 0, 0);  /* Korjattu tämä rivi */ 
+}
+
+#pelinTekstiesittely{
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    padding-top: 0px;
 }
 
 #aloituskuva {
+    width: 100%;  /* Aseta kuvan leveys haluamaksesi, esim. 100% tekee kuvasta yhtä leveän kuin sen sisältävä div */
+    max-width: 600px;  /* Voit rajoittaa kuvan maksimileveyttä, jos haluat */
+    display: block;  /* Asettaa kuvan lohkoelementiksi */
+    margin: 0 auto 20px;  /* Keskitä kuva ja lisää 20px marginaali alapuolelle */
+}
+
+#finlandization-logo {
     width: 100%;  /* Aseta kuvan leveys haluamaksesi, esim. 100% tekee kuvasta yhtä leveän kuin sen sisältävä div */
     max-width: 600px;  /* Voit rajoittaa kuvan maksimileveyttä, jos haluat */
     display: block;  /* Asettaa kuvan lohkoelementiksi */
@@ -62,7 +87,7 @@ canvas {
 
 .gameButton {
     padding: 10px 20px;
-    background-color: #007BFF;
+    background-color: #5900ff;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -76,7 +101,7 @@ canvas {
 
 #startScreen button {
     padding: 10px 20px;
-    background-color: #007BFF;
+    background-color: #5900ff;
     color: #fff;
     border: none;
     border-radius: 5px;

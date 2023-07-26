@@ -7,57 +7,16 @@ document.addEventListener("DOMContentLoaded", function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    let source;
-    let buffer;
-
-    fetch('audio/pelimusa.mp3')
-        .then(response => response.arrayBuffer())
-        .then(data => audioContext.decodeAudioData(data))
-        .then(decodedBuffer => {
-            buffer = decodedBuffer;
-        })
-        .catch(e => {
-            console.error(e);
-        });
-
-    function playSound(audioBuffer) {
-        source = audioContext.createBufferSource();
-        source.buffer = audioBuffer;
-        source.loop = true;
-        source.connect(audioContext.destination);
-        source.start();
-    }
-
-    let isPlaying = false;  // Muuttuja, joka seuraa, onko musiikki päällä vai ei
-
-    document.getElementById("musicToggle").addEventListener("change", function() {
-        if (this.checked) {
-            playSound(buffer);  // Aloita musiikki
-        } else {
-            stopSound();  // Pysäytä musiikki
-        }
-    });
-
-    // Kun haluat pysäyttää musiikin
-    function stopSound() {
-        if (source) {
-            source.stop();
-        }
-    }
     const playerImage = new Image();
     playerImage.src = 'kuvat/pelaaja.png';
 
     let gameState = "notStarted";
     //let gameLoopRunning = false;
 
-    canvas.addEventListener('touchstart', handleTouch, false);
-
     const baseSpeed = 20; // esimerkiksi 25 pikseliä per päivitys referenssinäytön leveydellä
     const referenceScreenWidth = 1220; // esimerkiksi Full HD -näytön leveys
 
     let playerSpeed = (canvas.width / referenceScreenWidth) * baseSpeed;
-
 
     function isMobileDevice() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -84,8 +43,6 @@ document.addEventListener("DOMContentLoaded", function() {
         hahmoBaseHeight = 80; // Pienennä hahmon korkeutta
     }
     
-
-
     let distanceFromBottom = 20; // esimerkiksi 50 pikseliä alareunasta
 
     let player = {
@@ -96,8 +53,6 @@ document.addEventListener("DOMContentLoaded", function() {
         speed: 25,
         direction: 1  // 1 for right, -1 for left
     };
-
-    
 
     const hahmoImages = [
         new Image(),
@@ -133,18 +88,27 @@ document.addEventListener("DOMContentLoaded", function() {
     esineet.speed = baseEsineSpeed * gameSpeedMultiplier;
     hahmot.speed = baseHahmoSpeed * gameSpeedMultiplier;
 
-    
     function startGame() {
+        stopSound();
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }        
         console.log("startGame called");
         document.getElementById("startScreen").style.display = "none";  // Piilota aloitusnäyttö
         document.body.style.overflow = 'hidden';
         if (gameState !== "playing") {
             gameState = "playing";
+            
+            if (audioContext.state !== 'suspended') {
+                playSound(gameMusicBuffer);
+            }
             gameLoop();
         }
     }
+    
     function restartGame() {
         // Nollaa pelin tila ja muuttujat
+        stopSound();
         gameState = "playing";
         esineet = [];
         hahmot = [];
@@ -154,10 +118,11 @@ document.addEventListener("DOMContentLoaded", function() {
         // Piilota pelin päättyneen näyttö ja käynnistä peli uudelleen
         document.getElementById("gameOverScreen").style.display = "none";
         //gameLoopRunning = false;
+        if (audioContext.state !== 'suspended') {
+            playSound(gameMusicBuffer);
+        }
         gameLoop();
     }
-
-
 
     function drawPlayer() {
         ctx.save();
@@ -169,7 +134,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         ctx.restore();
     }
-    // ...
 
     function spawnEsine() {
         let esineType = Math.random() < 0.9 ? 'sammakko' : 'risti';
@@ -205,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (Math.random() < 0.02) {
             spawnEsine();
         }
-
+        
         hahmot.forEach((hahmo) => {
             if (hahmo.state === 'descending' && hahmo.y < 0) {
                 hahmo.y += hahmo.speed;
@@ -217,9 +181,15 @@ document.addEventListener("DOMContentLoaded", function() {
                     hahmo.esine.y = hahmo.y + 50;  // Aseta esineen y-sijainti hahmon yläpuolelle
                     hahmo.esine.active = true;  // Aktivoi hahmoon liitetty esine
                     esineet.push(hahmo.esine);  // Siirrä esine esineet-taulukkoon
+                    
+                    if (hahmo.esine.type === "sammakko") {
+                        playKurnaus();
+                    } else {
+                        playRoyh();
+                    }
                     hahmo.esine = null;  // Poista esine hahmosta
                 }
-        
+                
                 setTimeout(() => {
                     hahmo.state = 'ascending';
                 }, 1000);
@@ -230,7 +200,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         });
-        // ... (muu koodi pysyy samana)
+    
+    
 
         // Esineiden päivitys
         esineet.forEach((esine, index) => {
@@ -273,10 +244,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     
     }
-
-    // ...
-
-
 
     function drawGame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -322,12 +289,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     
         if (gameState === "gameover") {
+            stopSound();
+            playSound(gameOverMusicBuffer);
             ctx.fillText("Peli päättyi!", canvas.width / 2, canvas.height / 2 - 20);
             document.getElementById("gameOverScreen").style.display = "block";
             return;  // lopeta piirto tässä
         }  
     }
-
 
     function gameLoop() {
         if (gameState === "playing") {
@@ -337,15 +305,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-
-
     document.addEventListener("keydown", function(e) {
         if (e.key === "ArrowLeft" && player.x > 0) {
-         
+            playKipitys();
             player.x -= playerSpeed;
             player.direction = -1;
         } else if (e.key === "ArrowRight" && player.x + player.width < canvas.width) {
-     
+            playKipitys();
             player.x += playerSpeed;
             player.direction = 1;
         }
@@ -359,27 +325,29 @@ document.addEventListener("DOMContentLoaded", function() {
             let touchX = e.touches[0].clientX;
             let touchDirection = touchX > canvas.width / 2 ? 1 : -1;
             player.direction = touchDirection;
-    
+            playKipitys();
             // Aloita toistuva liike
             movementInterval = setInterval(() => {
                 if (touchDirection === 1 && player.x + player.width < canvas.width) {
                     player.x += playerSpeed;
+                    playKipitys();
                 } else if (touchDirection === -1 && player.x > 0) {
                     player.x -= playerSpeed;
+                    playKipitys();
                 }
             }, 100);  // 100ms välein, voit säätää tätä arvoa tarpeesi mukaan
         } else if (e.type === 'touchend') {
             // Lopeta toistuva liike
             clearInterval(movementInterval);
+            stopKipitys();
         }
+        
     }
-    
-    
     setInterval(() => {
-        gameSpeedMultiplier += 0.1;  // Lisää nopeuskerrointa 0.1 yksiköllä
-    }, 30000);  // Kasvata nopeutta joka 30. sekunti
-    
-    
+        gameSpeedMultiplier += 0.1;
+        esineet.speed = baseEsineSpeed * gameSpeedMultiplier;
+        hahmot.speed = baseHahmoSpeed * gameSpeedMultiplier;
+    }, 30000);
     
 });
 

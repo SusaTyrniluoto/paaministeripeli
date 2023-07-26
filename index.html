@@ -3,32 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pääministerin Työpäivä</title>
+    <title>Päivä Pääministerinä</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="kuvat/favicon.png" type="image/png">
 
 </head>
 <body>
     <div id="startScreen">
-     
-        <img src="kuvat/esitekuva.png" alt="Esitekuva" id="aloituskuva">        
-        <h1>Päivä Pääministerinä!</h1>
-       
-        <button id="startButton" class="gameButton">Aloita peli</button>         
-        <br>
-        <h3>Musiikki:
-        <label class="switch">
-            <input type="checkbox" id="musicToggle">
-            <span class="slider round"></span>
-          </label>          
-        </h3>
+        <img src="kuvat/finlandization-logo.png" alt="Finlandization logo" id="finlandization-logo">
+        <div id="pelinEsittelyruutu">
+            <img src="kuvat/esitekuva.png" alt="Esitekuva" id="aloituskuva"> 
+            <div id="pelinTekstiesittely">       
+                <h1>Päivä Pääministerinä</h1>
+            
+                <button id="startButton" class="gameButton">Aloita peli</button>         
+                <br>
+                <h3>Musiikki:
+                <label class="switch">
+                    <input type="checkbox" id="musicToggle">
+                    <span class="slider round"></span>
+                </label>          
+                </h3>
 
-        <p>Tehtäväsi pääministerinä on poimia hallituskumppaneiden pudottamia sammakkoja ja ristejä haaviisi, ennen kuin ne päätyvät lehdistön käsiin!</p>
-        <p>Saat jokaisesta poimitusta sammakosta tai rististä yhden toimintakykypisteen. </p>
-        <p>Hallituksella on 10 toimintakykypistettä sen aloittaessa tehtävänsä, mutta sammakoiden päätyessä lehdistön käsiin menetät yhden toimintakykypisteen, ja ristin pudotessa ohitsesi menetät 10 toimintakykypistettä!</p>
-
+                <p>Tehtäväsi pääministerinä on poimia hallituskumppaneiden pudottamia sammakkoja ja ristejä haaviisi, ennen kuin ne päätyvät lehdistön käsiin.</p>
+                <p>Saat jokaisesta poimitusta sammakosta tai rististä yhden toimintakykypisteen. </p>
+                <p>Hallituksella on 10 toimintakykypistettä sen aloittaessa tehtävänsä, mutta sammakoiden päätyessä lehdistön käsiin menetät yhden toimintakykypisteen, ja ristin pudotessa ohitsesi menetät 10(!) toimintakykypistettä.</p>
+            </div>
+        </div>
     </div>
-
     <div id="gameOverScreen" style="display: none;">
         <h2>Hallitus kaatui!</h2>
         <p id="finalScore"></p>
@@ -37,7 +39,7 @@
     </div>
     
     <canvas id="gameCanvas"></canvas>
-
+    <script src="audioManager.js"></script>
     <script src="game.js"></script>
 </body>
 </html>
